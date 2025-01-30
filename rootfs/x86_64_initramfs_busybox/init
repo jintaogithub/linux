@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Mount virtual filesystems
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t devtmpfs devtmpfs /dev
+
+# Populate /dev
+echo /bin/busybox > /proc/sys/kernel/hotplug
+mdev -s
+
+# Set up environment
+export PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+
+# Shell startup message
+echo "----------------------------------------------------"
+echo " Successfully booted Linux 6.19!"
+echo " BusyBox version: $(busybox | head -1)"
+echo "----------------------------------------------------"
+
+# Start interactive shell
+# NOTE: this results in kernel staying in initramfs stage and never regains
+# control b/c kernel boot only prceeds to switching to real rootfs if `rdinit=`
+# process exits
+exec /bin/sh
